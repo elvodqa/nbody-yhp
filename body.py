@@ -11,6 +11,8 @@ class NBody:
         self.vy = 0 # velocity y
         self.ax = 0 # acceleration x
         self.ay = 0 # acceleration y
+        self.pax = 0 # previous acceleration x
+        self.pay = 0 # previous acceleration y
         self.density = 10 # density is introcuded,
         self.set_mass(100)
         self.color = (255, 255, 255) # Color of the planet in RGB format
@@ -19,7 +21,7 @@ class NBody:
         if self.debug:
             self.info_font = pygame.font.SysFont('Arial', 11) # Load the font for displaying info
     
-    def update(self, objects, G, delta):
+    def update(self, objects, G, delta, implementation='euler'):
         # Calculate acceleration
         for obj in objects:
             if obj == self:
@@ -37,27 +39,25 @@ class NBody:
             force = G * ((self.mass * obj.mass) / (distance**2))             # F = G * (m1 * m2) / r^2
 
             # Calculate acceleration
-            self.ax += force * dx / distance # a = F / m
-            self.ay += force * dy / distance # a = F / m
-
-        # update acceleration and velocity with delta
-        self.vx += self.ax * delta
-        self.vy += self.ay * delta
-        self.x += self.vx * delta
-        self.y += self.vy * delta
-        """
-        # Update velocity
-        self.vx += self.ax
-        self.vy += self.ay
-
-        # Update position
-        self.x += self.vx
-        self.y += self.vy
-
+            self.ax += force/self.mass * (dx/distance)          
+            self.ay += force/self.mass * (dy/distance)
+        if implementation == 'euler':
+            self.vx += self.ax * delta
+            self.vy += self.ay * delta
+            self.x += self.vx * delta
+            self.y += self.vy * delta
+        if implementation == 'verlet':
+            self.vx += 0.5 * (self.ax + self.pax) * delta
+            self.vy += 0.5 * (self.ay + self.pay) * delta
+            self.x += self.vx * delta + 0.5 * self.ax * delta**2
+            self.y += self.vy * delta + 0.5 * self.ay * delta**2
+            self.pax = self.ax
+            self.pay = self.ay
+       
         # Reset acceleration
         self.ax = 0
         self.ay = 0
-        """
+        
 
         # if colliding and the other object is bigger, destory self
         for obj in objects:
@@ -78,21 +78,24 @@ class NBody:
                 """
                 return True
                     
-        #self.trails.append((self.x, self.y))    
+        self.trails.append((self.x, self.y))    
         # append trails every 10 px moved
-        if self.debug:
-            if len(self.trails) == 0 or (self.trails[-1][0] - self.x)**2 + (self.trails[-1][1] - self.y)**2 > 10**2:
-                self.trails.append((self.x, self.y))        
+        #if self.debug:
+            #if len(self.trails) == 0 or (self.trails[-1][0] - self.x)**2 + (self.trails[-1][1] - self.y)**2 > 10**2:
+            #    self.trails.append((self.x, self.y)) 
+        # only keep last 10 trails
+        #if len(self.trails) > 100:
+        #    self.trails.pop(0)       
         return False
 
     def draw(self, screen, camera):
         # Draw trails
-        #for i in range(len(self.trails) - 1):
-        #    pygame.draw.line(screen, self.color, (int(self.trails[i][0] + camera[0]), int(self.trails[i][1] + camera[1])), (int(self.trails[i+1][0] + camera[0]), int(self.trails[i+1][1] + camera[1])), 1)
+        for i in range(len(self.trails) - 1):
+            pygame.draw.line(screen, self.color, (int(self.trails[i][0] + camera[0]), int(self.trails[i][1] + camera[1])), (int(self.trails[i+1][0] + camera[0]), int(self.trails[i+1][1] + camera[1])), 1)
 
         # Draw points leaving trails
-        for trail in self.trails:
-            pygame.draw.circle(screen, self.color, (trail[0] + camera[0], trail[1] + camera[1]), 1)
+        #for trail in self.trails:
+        #    pygame.draw.circle(screen, self.color, (trail[0] + camera[0], trail[1] + camera[1]), 1)
 
         pygame.draw.circle(screen, self.color, (self.x + camera[0], self.y + camera[1]), self.radius)
         
@@ -106,14 +109,19 @@ class NBody:
             screen.blit(info, (self.x + camera[0] - info.get_width() / 2, self.y + camera[1] - info.get_height() / 2 + 10))
             info = self.info_font.render(f'{self.vy:.2f} m/s', True, (255, 255, 255))
             screen.blit(info, (self.x + camera[0] - info.get_width() / 2, self.y + camera[1] - info.get_height() / 2 + 20))
+            """ No need for displaying acceleration since It is resetted end of the update function
             # acceleration
             info = self.info_font.render(f'{self.ax:.2f} m/s^2', True, (255, 255, 255))
             screen.blit(info, (self.x + camera[0] - info.get_width() / 2, self.y + camera[1] - info.get_height() / 2 + 30))
             info = self.info_font.render(f'{self.ay:.2f} m/s^2', True, (255, 255, 255))
             screen.blit(info, (self.x + camera[0] - info.get_width() / 2, self.y + camera[1] - info.get_height() / 2 + 40))
+            """
             # position
             info = self.info_font.render(f'{self.repr_pos()}', True, (255, 255, 255))
-            screen.blit(info, (self.x + camera[0] - info.get_width() / 2, self.y + camera[1] - info.get_height() / 2 + 50))
+            screen.blit(info, (self.x + camera[0] - info.get_width() / 2, self.y + camera[1] - info.get_height() / 2 + 30))
+            total_velocity = (self.vx**2 + self.vy**2)**0.5
+            info = self.info_font.render(f'Vel: {total_velocity:.2f} m/s', True, (255, 255, 255))
+            screen.blit(info, (self.x + camera[0] - info.get_width() / 2, self.y + camera[1] - info.get_height() / 2 + 40))
 
 
     def __str__(self) -> str:
