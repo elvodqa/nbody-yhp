@@ -165,3 +165,175 @@ def triple_ellipse_preset():
     simulation_speed = 0.1
     return objects, simulation_speed
 
+def orbit_two(G = 10):
+    global objects
+    objects = []
+    mass=1000000
+    rad=100
+
+    body1 = NBody(1280/2, 720/2, True)
+    body1.density = 1
+    body1.set_mass(mass, False)
+    body1.vx = 0
+    body1.vy = 0
+    body1.color = (255, 255, 255)
+    objects.append(body1)
+
+    body2 = NBody(1280/2, (720/2)+rad, True)
+    body2.density = 1
+    body2.set_mass(100, False)
+    body2.vx = (G*mass/rad)**0.5
+    body2.vy = 0
+    body2.color = (255, 255, 255)
+    objects.append(body2)
+
+    simulation_speed = 0.1
+    return objects, simulation_speed
+
+def orbit_three(G = 10):
+    global objects
+    objects = []
+
+    mass=1000000
+    rad=100
+
+    body1 = NBody(1280/2, 720/2, True)
+    body1.density = 1
+    body1.set_mass(mass, False)
+    body1.vx = 0
+    body1.vy = 0
+    body1.color = (255, 255, 255)
+    objects.append(body1)
+
+    body2 = NBody(1280/2, (720/2)+rad, True)
+    body2.density = 1
+    body2.set_mass(100, False)
+    body2.vx = (G*mass/rad)**0.5
+    body2.vy = 0
+    body2.color = (255, 255, 255)
+    objects.append(body2)
+
+    body3 = NBody(1280/2, (720/2)+(2*rad), True)
+    body3.density = 1
+    body3.set_mass(100, False)
+    body3.vx = -(G*mass/(rad*2))**0.5
+    body3.vy = 0
+    body3.color = (255, 255, 255)
+    objects.append(body3)
+
+    simulation_speed = 0.1
+    return objects, simulation_speed
+
+def orbit_four(G=10):
+    global objects
+    objects = []
+
+    mass=1000000
+    rad=100
+
+    body1 = NBody(1280/2, 720/2, True)
+    body1.density = 1
+    body1.set_mass(mass, False)
+    body1.vx = 0
+    body1.vy = 0
+    body1.color = (255, 255, 255)
+    objects.append(body1)
+
+    body2 = NBody(1280/2, (720/2)+rad, True)
+    body2.density = 1
+    body2.set_mass(100, False)
+    body2.vx = (G*mass/rad)**0.5
+    body2.vy = 0
+    body2.color = (255, 255, 255)
+    objects.append(body2)
+
+    body3 = NBody(1280/2, (720/2)+(2*rad), True)
+    body3.density = 1
+    body3.set_mass(100, False)
+    body3.vx = -(G*mass/(rad*2))**0.5
+    body3.vy = 0
+    body3.color = (255, 255, 255)
+    objects.append(body3)
+
+    body4 = NBody(1280/2, (720/2)+(3*rad), True)
+    body4.density = 1
+    body4.set_mass(100, False)
+    body4.vx = 0
+    body4.vy = (G*mass/(rad*3))**0.5
+    body4.color = (255, 255, 255)
+    objects.append(body4)
+
+    simulation_speed = 0.1
+    return objects, simulation_speed
+
+def ducati_three(G = 10):
+    global objects
+    objects = []
+
+    mass=1000000
+    rad=100
+
+    body1 = NBody(0, -0.070946548000287 * 100, True)
+    body1.density = 1
+    body1.set_mass(mass, False)
+    body1.vx = -1.231870762148251 * 100
+    body1.vy = 0
+    body1.color = (255, 255, 255)
+    objects.append(body1)
+
+    body2 = NBody(0, 1.075903540029147 * 100, True)
+    body2.density = 1
+    body2.set_mass(mass, False)
+    body2.vx = 0.195089035291636 * 100
+    body2.vy = 0
+    body2.color = (255, 255, 255)
+    objects.append(body2)
+
+    body3 = NBody(0, -1.004956992028862 * 100, True)
+    body3.density = 1
+    body3.set_mass(mass, False)
+    body3.vx = 1.036781726856616 * 100
+    body3.vy = 0
+    body3.color = (255, 255, 255)
+    objects.append(body3)
+
+    simulation_speed = 0.1
+    return objects, simulation_speed
+
+def sun_earth_moon(G = 10):
+    global objects
+    objects = []
+    mass=1000000
+    rad=300
+
+    body1 = NBody(1280/2, 720/2, True)
+    body1.density = 1
+    body1.set_mass(mass, False)
+    body1.vx = 0
+    body1.vy = 0
+    # yellow
+    body1.color = (255, 255, 0)
+    objects.append(body1)
+
+    body2 = NBody(1280/2, (720/2)+rad, True)
+    body2.density = 1
+    body2.set_mass(1000, False)
+    body2.radius = 5
+    body2.vx = (G*mass/rad)**0.5
+    body2.vy = 0
+    # blue
+    body2.color = (0, 150, 200)
+    objects.append(body2)
+
+    body3 = NBody(1280/2, (720/2)+rad+10, True)
+    body3.density = 1
+    body3.set_mass(10, False)
+    body3.radius = 2
+    rad = 10
+    body3.vx = (G*body2.mass/rad)**0.5 + body2.vx
+    body3.vy = 0
+    body3.color = (255, 255, 255)
+    objects.append(body3)
+    simulation_speed = 0.1
+    return objects, simulation_speed
+
