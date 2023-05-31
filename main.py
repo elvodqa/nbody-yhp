@@ -1,13 +1,13 @@
 import pygame
 import pygame_gui
 from body import NBody
-from presets import solar_system, grid_3x3, galaxy_simulation, star_cluster, triple_ellipse_preset
+from presets import orbit_three, orbit_two, solar_system, grid_3x3, galaxy_simulation, star_cluster, triple_ellipse_preset, orbit_four, ducati_three, sun_earth_moon
 
 running = True
 pygame.init()
 
 screen = pygame.display.set_mode([1280, 720], pygame.DOUBLEBUF | pygame.HWACCEL | pygame.HWSURFACE)
-pygame.display.set_caption('Physics Engine - v0.0.1')
+pygame.display.set_caption('Physics Engine - v0.0.3')
 
 manager = pygame_gui.UIManager((1280, 720))
 
@@ -20,7 +20,7 @@ debug_font = pygame.font.SysFont('Arial', 12)
 
 
 
-global objects 
+global objects
 objects = []
 
 simulation_speed = 1
@@ -28,7 +28,7 @@ simulation_speed = 1
 body_mass = 100
 body_density = 1
 body_color = (255, 255, 255)
-G_constant = 1 # 6.67408e-11
+G_constant = 10 # 6.67408e-11
 
 
 clear_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1120, 0), (160, 50)),
@@ -40,7 +40,7 @@ speed_slider_text = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((1120,
 
 speed_slider = pygame_gui.elements.UIHorizontalSlider(relative_rect=pygame.Rect((1120, 60), (160, 50)),
                                             start_value=simulation_speed,
-                                            value_range=(0, 1000),
+                                            value_range=(0, 10000),
                                             manager=manager)
 speed_slider.set_current_value = 100
 preset_selection_text = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((1120, 100), (160, 30)),
@@ -48,7 +48,16 @@ preset_selection_text = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((1
                                             manager=manager)
 
 preset_selection = pygame_gui.elements.UISelectionList(relative_rect=pygame.Rect((1120, 120), (160, 200)),
-                                            item_list=['Solar system', '3x3 grid', 'Galaxy', 'Cluster', 'Triple Ellipse'],
+                                            item_list=['Solar system', 
+                                                       '3x3 grid', 
+                                                       'Galaxy', 
+                                                       'Cluster', 
+                                                       'Triple Ellipse', 
+                                                       'Orbit 2',
+                                                       'Orbit 3',
+                                                       'Orbit 4', 
+                                                       'Ducati 3',
+                                                       'Sun Earth Moon'],
                                             manager=manager)
 
 current_bodies = pygame_gui.elements.UISelectionList(relative_rect=pygame.Rect((1120, 320), (160, 200)),
@@ -93,6 +102,14 @@ radius_mode = pygame_gui.elements.UISelectionList(relative_rect=pygame.Rect((112
 radius_mode_text = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((1120-160, 0), (160, 30)),
                                             text='Radius Mode',
                                             manager=manager)
+implementation = 'euler'
+implementation_text = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((1120-160, 80), (160, 30)),
+                                            text='Implementation',
+                                            manager=manager)
+implementation_selection = pygame_gui.elements.UISelectionList(relative_rect=pygame.Rect((1120-160, 110), (160, 46)),
+                                            item_list=['Euler', 'Verlet'],
+                                            manager=manager)
+
 radius_mode_val = 'Realistic'
 while running:
     body_delta = (clock.tick(60) / 1000) * simulation_speed
@@ -155,6 +172,13 @@ while running:
                         obj.set_mass(obj.mass, False)
                 print(f'Radius mode: 1')
             
+            if event.ui_element == implementation_selection:
+                if event.text == 'Euler':
+                    implementation = 'euler'
+                if event.text == 'Verlet':
+                    implementation = 'verlet'
+                print(f'Implementation: {implementation}')
+            
             if event.ui_element == current_bodies:
                 for obj in objects:
                     if obj.repr_pos() == event.text:
@@ -176,6 +200,16 @@ while running:
                     objects, simulation_speed = star_cluster()
                 if event.text == 'Triple Ellipse':
                     objects, simulation_speed = triple_ellipse_preset()
+                if event.text == 'Orbit 2':
+                    objects, simulation_speed = orbit_two(G_constant)
+                if event.text == 'Orbit 3':
+                    objects, simulation_speed = orbit_three(G_constant)
+                if event.text == 'Orbit 4':
+                    objects, simulation_speed = orbit_four(G_constant)
+                if event.text == 'Ducati 3':
+                    objects, simulation_speed = ducati_three(G_constant)
+                if event.text == 'Sun Earth Moon':
+                    objects, simulation_speed = sun_earth_moon()
                 else:
                     print('No preset selected.')
                 objs = []
@@ -221,7 +255,7 @@ while running:
     manager.update(time_delta)
     # Update objects
     for obj in objects:
-        if obj.update(objects, G_constant, body_delta):
+        if obj.update(objects, G_constant, body_delta, implementation):
             #objs = []
             #for obj in objects:
             #    objs.append(obj.repr_pos())
@@ -256,7 +290,7 @@ while running:
     #pygame.draw.rect(screen, (255, 255, 255), (0+camera[0], 0+camera[1], 1280+camera[0], 720+camera[1]), 1)
 
     pygame.display.flip()
-    clock.tick(60) # Update everything 30 times per second
+    clock.tick(120) # Update everything 120 times per second
 
 
 pygame.quit()
