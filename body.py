@@ -85,9 +85,10 @@ class NBody:
             #    self.trails.append((self.x, self.y)) 
         # only keep last 10 trails
         #if len(self.trails) > 100:
-        #    self.trails.pop(0)       
+        #    self.trails.pop(0)    
         return False
-
+    def clear_trails(self):
+        self.trails = []
     def draw(self, screen, camera):
         # Draw trails
         for i in range(len(self.trails) - 1):
