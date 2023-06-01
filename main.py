@@ -145,6 +145,9 @@ while running:
                 simulation_speed -= 0.1
                 if simulation_speed < 0:
                     simulation_speed = 0
+            if event.key == pygame.K_c:
+                for obj in objects:
+                    obj.clear_trails()
 
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
               if event.ui_element == clear_button:
@@ -254,16 +257,13 @@ while running:
 
     manager.update(time_delta)
     # Update objects
-    for obj in objects:
-        if obj.update(objects, G_constant, body_delta, implementation):
-            #objs = []
-            #for obj in objects:
-            #    objs.append(obj.repr_pos())
-            #current_bodies.set_item_list(objs)
-            pass
-
-        objs.clear()
-        objs.append(obj.repr_pos())
+    for i in range(int(simulation_speed * 5)):
+        for obj in objects:
+            obj.update(objects, G_constant, 0.01, implementation)
+            #objs.clear()
+            #objs.append(obj.repr_pos())
+        
+    
     
     #screen.fill((88, 85, 83)) # Clear screen
     screen.fill((0, 0, 0))
