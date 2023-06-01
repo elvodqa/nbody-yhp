@@ -99,6 +99,7 @@ g_constant_text = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((1120, 6
 radius_mode = pygame_gui.elements.UISelectionList(relative_rect=pygame.Rect((1120-160, 30), (160, 46)),
                                             item_list=['Realistic', 'Log2'],
                                             manager=manager)
+radius_mode_val = 'Realistic'
 radius_mode_text = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((1120-160, 0), (160, 30)),
                                             text='Radius Mode',
                                             manager=manager)
@@ -167,10 +168,12 @@ while running:
             if event.ui_element == radius_mode:
                 if event.text == 'Realistic':
                     radius_mode_text = 'Realistic'
+                    radius_mode_val = 'Realistic'
                     for obj in objects:
                         obj.set_mass(obj.mass, True)
                 if event.text == 'Log2':
                     radius_mode_text = 'Log2'
+                    radius_mode_val = 'Log2'
                     for obj in objects:
                         obj.set_mass(obj.mass, False)
                 print(f'Radius mode: 1')
@@ -288,6 +291,13 @@ while running:
     screen.blit(sim_text, (0, 45))
     # draw borders of 0x0 to 1280x720
     #pygame.draw.rect(screen, (255, 255, 255), (0+camera[0], 0+camera[1], 1280+camera[0], 720+camera[1]), 1)
+    # radius mode
+    radius_mode_text = debug_font.render(f'Radius mode: {radius_mode_val}', True, (255, 255, 255))
+    screen.blit(radius_mode_text, (0, 60))
+    # implementation
+    implementation_text = debug_font.render(f'Implementation: {implementation}', True, (255, 255, 255))
+    screen.blit(implementation_text, (0, 75))
+
 
     pygame.display.flip()
     clock.tick(120) # Update everything 120 times per second
